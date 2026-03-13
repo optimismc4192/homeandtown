@@ -1,0 +1,98 @@
+{
+  "entities": {
+    "Property": {
+      "title": "Property",
+      "description": "A real estate property listing.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "youtubeId": { "type": "string" },
+        "thumbnail": { "type": "string", "format": "uri" },
+        "priceStr": { "type": "string" },
+        "priceNum": { "type": "number" },
+        "landArea": { "type": "string" },
+        "buildArea": { "type": "string" },
+        "landAreaNum": { "type": "number" },
+        "buildAreaNum": { "type": "number" },
+        "floors": { "type": "number" },
+        "heating": { "type": "string" },
+        "parking": { "type": "string" },
+        "yard": { "type": "string" },
+        "location": { "type": "string" },
+        "region": { "type": "string" },
+        "coords": {
+          "type": "object",
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" }
+          },
+          "required": ["x", "y"]
+        },
+        "type": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "images": {
+          "type": "array",
+          "items": { "type": "string", "format": "uri" }
+        },
+        "overviewImages": {
+          "type": "array",
+          "items": { "type": "string", "format": "uri" }
+        },
+        "description": { "type": "string" },
+        "curation": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "isPopular": { "type": "boolean" },
+        "isClosingSoon": { "type": "boolean" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved"]
+        },
+        "isVisible": { "type": "boolean" },
+        "contact": { "type": "string" }
+      },
+      "required": [
+        "title", "youtubeId", "thumbnail", "priceStr", "priceNum",
+        "landArea", "buildArea", "landAreaNum", "buildAreaNum", "floors",
+        "heating", "parking", "yard", "location", "region", "coords",
+        "type", "tags", "description"
+      ]
+    },
+    "Reservation": {
+      "title": "Reservation",
+      "description": "A user's reservation request for a property.",
+      "type": "object",
+      "properties": {
+        "propertyId": { "type": "string" },
+        "propertyTitle": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "status": {
+          "type": "string",
+          "enum": ["대기중", "확정", "취소"]
+        }
+      },
+      "required": [
+        "propertyId", "propertyTitle", "name", "phone", "date", "createdAt", "status"
+      ]
+    }
+  },
+  "firestore": {
+    "properties/{propertyId}": {
+      "schema": { "$ref": "#/entities/Property" },
+      "description": "Stores all property listings."
+    },
+    "reservations/{reservationId}": {
+      "schema": { "$ref": "#/entities/Reservation" },
+      "description": "Stores all reservation requests."
+    }
+  }
+}

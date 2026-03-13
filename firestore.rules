@@ -1,0 +1,191 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: properties
+    // Document ID: auto-generated
+    // Fields:
+    //   - title: string (required)
+    //   - youtubeId: string (required)
+    //   - thumbnail: string (required)
+    //   - priceStr: string (required)
+    //   - priceNum: number (required)
+    //   - landArea: string (required)
+    //   - buildArea: string (required)
+    //   - landAreaNum: number (required)
+    //   - buildAreaNum: number (required)
+    //   - floors: number (required)
+    //   - heating: string (required)
+    //   - parking: string (required)
+    //   - yard: string (required)
+    //   - location: string (required)
+    //   - region: string (required)
+    //   - coords: map { x: number, y: number } (required)
+    //   - type: string (required)
+    //   - tags: list of strings (required)
+    //   - images: list of strings (optional)
+    //   - overviewImages: list of strings (optional)
+    //   - description: string (required)
+    //   - curation: list of strings (optional)
+    //   - isPopular: boolean (optional)
+    //   - isClosingSoon: boolean (optional)
+    //   - status: string ('pending' | 'approved') (optional)
+    //   - isVisible: boolean (optional)
+    //   - contact: string (optional)
+    //
+    // Collection: reservations
+    // Document ID: auto-generated
+    // Fields:
+    //   - propertyId: string (required)
+    //   - propertyTitle: string (required)
+    //   - name: string (required)
+    //   - phone: string (required)
+    //   - date: string (required)
+    //   - time: string (optional)
+    //   - message: string (optional)
+    //   - createdAt: string (required)
+    //   - status: string ('대기중' | '확정' | '취소') (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Default admin check. In a real app, you might want to store admin roles in a users collection.
+    // For this prototype, we'll allow the specific user email to act as admin.
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.email == "optimismc4192@gmail.com" && request.auth.token.email_verified == true;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+             request.resource.data[field].size() >= minLen &&
+             request.resource.data[field].size() <= maxLen;
+    }
+
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].size() >= minLen &&
+              request.resource.data[field].size() <= maxLen);
+    }
+
+    function isValidList(listField, maxSize) {
+      return request.resource.data[listField] is list && request.resource.data[listField].size() <= maxSize;
+    }
+
+    function isValidOptionalList(listField, maxSize) {
+      return !(listField in request.resource.data) ||
+             (request.resource.data[listField] is list && request.resource.data[listField].size() <= maxSize);
+    }
+
+    function isValidCoords() {
+      let coords = request.resource.data.coords;
+      return coords is map && coords.keys().hasAll(['x', 'y']) && coords.x is number && coords.y is number;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidProperty() {
+      let requiredFields = [
+        'title', 'youtubeId', 'thumbnail', 'priceStr', 'priceNum',
+        'landArea', 'buildArea', 'landAreaNum', 'buildAreaNum', 'floors',
+        'heating', 'parking', 'yard', 'location', 'region', 'coords',
+        'type', 'tags', 'description'
+      ];
+
+      return hasRequiredFields(requiredFields) &&
+             validStringLength('title', 1, 200) &&
+             validStringLength('youtubeId', 1, 50) &&
+             validStringLength('thumbnail', 1, 500) &&
+             validStringLength('priceStr', 1, 50) &&
+             request.resource.data.priceNum is number && request.resource.data.priceNum >= 0 &&
+             validStringLength('landArea', 1, 50) &&
+             validStringLength('buildArea', 1, 50) &&
+             request.resource.data.landAreaNum is number && request.resource.data.landAreaNum >= 0 &&
+             request.resource.data.buildAreaNum is number && request.resource.data.buildAreaNum >= 0 &&
+             request.resource.data.floors is number && request.resource.data.floors >= 0 &&
+             validStringLength('heating', 1, 100) &&
+             validStringLength('parking', 1, 100) &&
+             validStringLength('yard', 1, 100) &&
+             validStringLength('location', 1, 200) &&
+             validStringLength('region', 1, 100) &&
+             isValidCoords() &&
+             validStringLength('type', 1, 50) &&
+             isValidList('tags', 20) &&
+             validStringLength('description', 1, 5000) &&
+             isValidOptionalList('images', 50) &&
+             isValidOptionalList('overviewImages', 50) &&
+             isValidOptionalList('curation', 20) &&
+             (!('isPopular' in request.resource.data) || request.resource.data.isPopular is bool) &&
+             (!('isClosingSoon' in request.resource.data) || request.resource.data.isClosingSoon is bool) &&
+             (!('status' in request.resource.data) || request.resource.data.status in ['pending', 'approved']) &&
+             (!('isVisible' in request.resource.data) || request.resource.data.isVisible is bool) &&
+             isValidOptionalString('contact', 0, 100);
+    }
+
+    function isValidReservation() {
+      let requiredFields = [
+        'id', 'propertyId', 'propertyTitle', 'name', 'phone', 'date', 'createdAt', 'status'
+      ];
+
+      return hasRequiredFields(requiredFields) &&
+             request.resource.data.id is number &&
+             request.resource.data.propertyId is number &&
+             validStringLength('propertyTitle', 1, 200) &&
+             validStringLength('name', 1, 100) &&
+             validStringLength('phone', 1, 50) &&
+             validStringLength('date', 1, 50) &&
+             isValidOptionalString('time', 0, 50) &&
+             isValidOptionalString('message', 0, 1000) &&
+             validStringLength('createdAt', 1, 50) &&
+             request.resource.data.status in ['대기중', '확정', '취소'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /properties/{propertyId} {
+      // Anyone can read approved properties. Admins can read all.
+      allow read: if (resource.data.status == 'approved') || isAdmin();
+      
+      // Anyone can create a property (it goes to 'pending' state usually).
+      // We force status to be 'pending' if a non-admin creates it to prevent self-approval.
+      allow create: if isValidProperty() && 
+                    (isAdmin() || (!('status' in request.resource.data) || request.resource.data.status == 'pending'));
+      
+      // Only admins can update or delete properties
+      allow update: if isAdmin() && isValidProperty();
+      allow delete: if isAdmin();
+    }
+
+    match /reservations/{reservationId} {
+      // Only admins can read reservations
+      allow read: if isAdmin();
+      
+      // Anyone can create a reservation
+      allow create: if isValidReservation() && request.resource.data.status == '대기중';
+      
+      // Only admins can update or delete reservations
+      allow update: if isAdmin() && isValidReservation();
+      allow delete: if isAdmin();
+    }
+  }
+}
