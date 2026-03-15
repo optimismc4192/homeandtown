@@ -24,20 +24,20 @@ export default function CompareModal({ isOpen, onClose }: CompareModalProps) {
           </button>
         </div>
 
-        <div className="flex-1 overflow-auto p-4 md:p-6">
+        <div className="flex-1 overflow-auto p-4 md:p-6 bg-zinc-50 md:bg-white">
           {compareList.length === 0 ? (
             <div className="text-center py-12 text-zinc-500">
               비교할 매물이 없습니다. 매물 카드에서 비교하기 버튼을 눌러 추가해주세요.
             </div>
           ) : (
-            <div className="min-w-[600px] grid" style={{ gridTemplateColumns: `120px repeat(${compareList.length}, minmax(200px, 1fr))` }}>
+            <div className="grid min-w-[600px]" style={{ gridTemplateColumns: `120px repeat(${compareList.length}, minmax(200px, 1fr))` }}>
               {/* Header Row */}
               <div className="font-bold text-zinc-400 text-xs uppercase tracking-widest py-4 border-b border-zinc-200"></div>
               {compareList.map(property => (
                 <div key={property.id} className="p-4 border-b border-zinc-200 relative group">
                   <button 
                     onClick={() => toggleCompareProperty(property)}
-                    className="absolute top-2 right-2 p-1 bg-white rounded-full text-zinc-400 hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-2 right-2 p-1 bg-white rounded-full text-zinc-400 hover:text-red-500 shadow-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                   >
                     <X size={16} />
                   </button>

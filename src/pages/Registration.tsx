@@ -5,12 +5,35 @@ import { useProperties } from '../store/PropertyContext';
 import { Property } from '../types';
 import { REGION_DATA } from '../data/regions';
 import { compressImage } from '../utils/imageCompression';
+import { storage } from '../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import { Helmet } from 'react-helmet-async';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 
 const MapSelector = ({ coords, setCoords }: { coords: {x: number, y: number} | null, setCoords: (c: {x: number, y: number}) => void }) => {
   const mapRef = useRef<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery + ' 대한민국')}`);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const newCoords = { x: parseFloat(data[0].lat), y: parseFloat(data[0].lon) };
+        setCoords(newCoords);
+        if (mapRef.current) {
+          mapRef.current.flyTo([newCoords.x, newCoords.y], 15);
+        }
+      } else {
+        alert('검색 결과가 없습니다.');
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      alert('주소 검색 중 오류가 발생했습니다.');
+    }
+  };
 
   const MapEvents = () => {
     useMapEvents({
@@ -30,41 +53,56 @@ const MapSelector = ({ coords, setCoords }: { coords: {x: number, y: number} | n
   const defaultCoords = { x: 37.5665, y: 126.9780 }; // Seoul
 
   return (
-    <div className="h-[300px] w-full bg-zinc-100 relative z-0">
-      <MapContainer 
-        center={[coords?.x || defaultCoords.x, coords?.y || defaultCoords.y]} 
-        zoom={13} 
-        style={{ height: '100%', width: '100%' }}
-        ref={mapRef}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-2">
+        <input 
+          type="text" 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSearch();
+            }
+          }}
+          placeholder="주소 또는 장소 검색 (예: 파주시 야당동)" 
+          className="flex-1 border border-zinc-200 px-3 py-2 text-xs focus:outline-none focus:border-zinc-900"
         />
-        {coords && (
-          <Marker 
-            position={[coords.x, coords.y]} 
-            draggable={true}
-            eventHandlers={{
-              dragend: (e) => {
-                const marker = e.target;
-                const position = marker.getLatLng();
-                setCoords({ x: position.lat, y: position.lng });
-              },
-            }}
+        <button type="button" onClick={handleSearch} className="bg-zinc-900 text-white px-4 py-2 text-xs font-bold whitespace-nowrap">검색</button>
+      </div>
+      <div className="h-[300px] w-full bg-zinc-100 relative z-0">
+        <MapContainer 
+          center={[coords?.x || defaultCoords.x, coords?.y || defaultCoords.y]} 
+          zoom={13} 
+          style={{ height: '100%', width: '100%' }}
+          ref={mapRef}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-        )}
-        <MapEvents />
-      </MapContainer>
-      <div className="absolute top-2 right-2 z-[400] bg-white px-3 py-2 text-xs font-bold shadow-md rounded pointer-events-none">
-        지도를 클릭하거나 마커를 드래그하여 정확한 위치를 설정하세요.
+          {coords && (
+            <Marker 
+              position={[coords.x, coords.y]} 
+              draggable={true}
+              eventHandlers={{
+                dragend: (e) => {
+                  const marker = e.target;
+                  const position = marker.getLatLng();
+                  setCoords({ x: position.lat, y: position.lng });
+                },
+              }}
+            />
+          )}
+          <MapEvents />
+        </MapContainer>
+        <div className="absolute top-2 right-2 z-[400] bg-white px-3 py-2 text-xs font-bold shadow-md rounded pointer-events-none">
+          지도를 클릭하거나 마커를 드래그하여 정확한 위치를 설정하세요.
+        </div>
       </div>
     </div>
   );
 };
-
-import { storage } from '../firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function Registration() {
   const navigate = useNavigate();
@@ -332,9 +370,9 @@ export default function Registration() {
       } else {
         setImages(prev => [...prev, ...urls]);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('이미지 업로드에 실패했습니다.');
+      alert(`이미지 업로드에 실패했습니다: ${err.message || '알 수 없는 오류'}`);
     } finally {
       if (isOverview) {
         setIsUploadingOverview(false);
@@ -362,9 +400,9 @@ export default function Registration() {
       const url = await getDownloadURL(storageRef);
       
       setThumbnail(url);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('썸네일 업로드에 실패했습니다.');
+      alert(`썸네일 업로드에 실패했습니다: ${err.message || '알 수 없는 오류'}`);
     } finally {
       setIsUploadingThumbnail(false);
       if (thumbnailInputRef.current) thumbnailInputRef.current.value = '';
@@ -396,9 +434,9 @@ export default function Registration() {
       }
       
       setImages(prev => [...prev, ...urls]);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('이미지 업로드에 실패했습니다.');
+      alert(`이미지 업로드에 실패했습니다: ${err.message || '알 수 없는 오류'}`);
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -446,9 +484,9 @@ export default function Registration() {
       }
       
       setOverviewImages(prev => [...prev, ...urls]);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('이미지 업로드에 실패했습니다.');
+      alert(`이미지 업로드에 실패했습니다: ${err.message || '알 수 없는 오류'}`);
     } finally {
       setIsUploadingOverview(false);
       if (overviewFileInputRef.current) overviewFileInputRef.current.value = '';

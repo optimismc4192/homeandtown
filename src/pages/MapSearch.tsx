@@ -293,9 +293,13 @@ export default function MapSearch() {
                 position={[property.coords.x, property.coords.y]}
                 icon={customIcon}
                 eventHandlers={{
-                  mouseover: () => setHoveredPropertyId(property.id),
-                  mouseout: () => setHoveredPropertyId(null),
-                  click: () => navigate(`/property/${property.id}`)
+                  mouseover: (e) => {
+                    setHoveredPropertyId(property.id);
+                    e.target.openPopup();
+                  },
+                  mouseout: () => {
+                    setHoveredPropertyId(null);
+                  }
                 }}
               >
                 <Popup className="custom-popup">

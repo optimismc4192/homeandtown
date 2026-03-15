@@ -33,6 +33,8 @@ export const PropertyProvider = ({ children }: { children: ReactNode }) => {
   const [compareList, setCompareList] = useState<Property[]>([]);
   const { user } = useAuth();
 
+  const [compareWarning, setCompareWarning] = useState<string | null>(null);
+
   // Load recent and compare from localStorage on mount
   useEffect(() => {
     const savedRecent = localStorage.getItem('recentProperties');
@@ -65,12 +67,15 @@ export const PropertyProvider = ({ children }: { children: ReactNode }) => {
     setCompareList(prev => {
       const exists = prev.some(p => p.id === property.id);
       if (exists) {
+        setCompareWarning(null);
         return prev.filter(p => p.id !== property.id);
       } else {
         if (prev.length >= 3) {
-          alert('비교하기는 최대 3개까지만 가능합니다.');
+          setCompareWarning('비교하기는 최대 3개까지만 가능합니다.');
+          setTimeout(() => setCompareWarning(null), 3000);
           return prev;
         }
+        setCompareWarning(null);
         return [...prev, property];
       }
     });
@@ -256,6 +261,11 @@ export const PropertyProvider = ({ children }: { children: ReactNode }) => {
       recentProperties, addRecentProperty, clearRecentProperties, compareList, toggleCompareProperty
     }}>
       {children}
+      {compareWarning && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] bg-zinc-900 text-white px-6 py-3 rounded-full shadow-2xl text-xs md:text-sm font-bold flex items-center gap-2 transition-all">
+          <span className="text-red-500">⚠️</span> {compareWarning}
+        </div>
+      )}
     </PropertyContext.Provider>
   );
 };

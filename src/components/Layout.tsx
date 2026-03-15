@@ -88,12 +88,13 @@ export default function Layout() {
           {/* Compare Button */}
           <button 
             onClick={() => setIsCompareModalOpen(true)}
-            className="w-12 h-12 bg-zinc-900 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-zinc-800 transition-colors relative"
+            className="h-12 px-4 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition-colors relative gap-2"
             title="매물 비교하기"
           >
             <Layers size={20} />
+            <span className="text-xs font-bold tracking-widest uppercase">비교하기</span>
             {compareList.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-zinc-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
                 {compareList.length}
               </span>
             )}

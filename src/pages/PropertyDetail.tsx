@@ -170,8 +170,8 @@ export default function PropertyDetail() {
                 <h3 className="text-base md:text-lg font-medium text-zinc-900 border-b border-zinc-200 pb-2 mb-4 font-serif">Gallery</h3>
                 <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory hide-scrollbar">
                   {property.images.map((img, idx) => (
-                    <div key={idx} className="aspect-square w-64 md:w-80 shrink-0 snap-center bg-zinc-100 overflow-hidden rounded-lg border border-zinc-200">
-                      <img src={img} alt={`Property view ${idx + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                    <div key={idx} className="h-64 md:h-96 w-auto shrink-0 snap-center bg-zinc-100 overflow-hidden rounded-lg border border-zinc-200 flex items-center justify-center">
+                      <img src={img} alt={`Property view ${idx + 1}`} className="h-full w-auto object-contain hover:scale-105 transition-transform duration-500" />
                     </div>
                   ))}
                 </div>
@@ -184,8 +184,8 @@ export default function PropertyDetail() {
               {property.overviewImages && property.overviewImages.length > 0 && (
                 <div className="mb-8 space-y-4">
                   {property.overviewImages.map((img, idx) => (
-                    <div key={idx} className="w-full aspect-video bg-zinc-100 overflow-hidden rounded-lg border border-zinc-200">
-                      <img src={img} alt={`Overview ${idx + 1}`} className="w-full h-full object-cover" />
+                    <div key={idx} className="w-full bg-zinc-100 overflow-hidden rounded-lg border border-zinc-200 flex items-center justify-center">
+                      <img src={img} alt={`Overview ${idx + 1}`} className="w-full h-auto object-contain" />
                     </div>
                   ))}
                 </div>
