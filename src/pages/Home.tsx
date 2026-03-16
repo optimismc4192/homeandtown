@@ -202,11 +202,17 @@ export default function Home() {
   return (
     <div className="flex flex-col h-full overflow-y-auto bg-zinc-900">
       <Helmet>
-        <title>전원주택, 단독주택, 타운하우스 매물 정보 | 홈</title>
-        <meta name="description" content="당신이 찾는 전원단독주택의 모든 정보. 전국 각지의 엄선된 전원주택, 타운하우스, 단독주택 매물을 확인하세요." />
-        <meta property="og:title" content="전원주택, 단독주택, 타운하우스 매물 정보 | 홈" />
-        <meta property="og:description" content="당신이 찾는 전원단독주택의 모든 정보. 전국 각지의 엄선된 전원주택, 타운하우스, 단독주택 매물을 확인하세요." />
+        <title>타운앤전원 - 프리미엄 전원주택, 타운하우스, 단독주택 분양</title>
+        <meta name="description" content="전국 각지의 엄선된 전원주택, 타운하우스, 단독주택 매물을 확인하세요. 가격, 면적, 난방 방식 등 다양한 필터로 맞춤 검색이 가능합니다." />
+        <meta name="keywords" content="전원주택, 타운하우스, 단독주택, 부동산, 분양, 매매, 타운앤전원" />
+        <link rel="canonical" href="https://www.townnhouse.com/" />
+        <meta property="og:title" content="타운앤전원 - 프리미엄 전원주택, 타운하우스 분양" />
+        <meta property="og:description" content="전국 각지의 엄선된 전원주택, 타운하우스, 단독주택 매물을 확인하세요." />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.townnhouse.com/" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="타운앤전원 - 프리미엄 전원주택, 타운하우스 분양" />
+        <meta name="twitter:description" content="전국 각지의 엄선된 전원주택, 타운하우스, 단독주택 매물을 확인하세요." />
       </Helmet>
       {/* Hero Section */}
       <section className="relative min-h-[200px] h-[25vh] md:min-h-[260px] md:h-[30vh] flex items-center justify-center overflow-hidden bg-black">

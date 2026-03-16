@@ -93,12 +93,19 @@ export default function PropertyDetail() {
   return (
     <div className="flex flex-col h-full overflow-y-auto bg-white">
       <Helmet>
-        <title>{property.title} | 전원주택 매물</title>
+        <title>{property.title} | 타운앤전원</title>
         <meta name="description" content={`${property.location}에 위치한 ${property.type} 매물입니다. 가격: ${property.priceStr}, 면적: ${property.buildArea}. ${property.description?.replace(/\\n/g, ' ').substring(0, 100)}...`} />
-        <meta property="og:title" content={`${property.title} | 전원주택 매물`} />
+        <meta name="keywords" content={`${property.location} 전원주택, ${property.location} 타운하우스, ${property.type}, 부동산, 분양, 매매`} />
+        <link rel="canonical" href={`https://www.townnhouse.com/property/${property.id}`} />
+        <meta property="og:title" content={`${property.title} | 타운앤전원`} />
         <meta property="og:description" content={`${property.location}에 위치한 ${property.type} 매물입니다. 가격: ${property.priceStr}, 면적: ${property.buildArea}.`} />
         <meta property="og:image" content={property.thumbnail} />
         <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://www.townnhouse.com/property/${property.id}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${property.title} | 타운앤전원`} />
+        <meta name="twitter:description" content={`${property.location}에 위치한 ${property.type} 매물입니다. 가격: ${property.priceStr}, 면적: ${property.buildArea}.`} />
+        <meta name="twitter:image" content={property.thumbnail} />
       </Helmet>
       {/* Sticky Header */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-zinc-200 px-4 md:px-8 py-4 flex items-center justify-between">
