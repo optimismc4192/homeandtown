@@ -120,6 +120,8 @@ export default function Registration() {
   const [isUploadingOverview, setIsUploadingOverview] = useState(false);
   const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
+  const [draggedOverviewIndex, setDraggedOverviewIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const overviewFileInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
@@ -509,6 +511,54 @@ export default function Registration() {
     });
   };
 
+  const handleImageDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    setDraggedImageIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleImageDragOverReorder = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleImageDropReorder = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    if (draggedImageIndex === null || draggedImageIndex === index) return;
+    
+    setImages(prev => {
+      const newImages = [...prev];
+      const draggedImage = newImages[draggedImageIndex];
+      newImages.splice(draggedImageIndex, 1);
+      newImages.splice(index, 0, draggedImage);
+      return newImages;
+    });
+    setDraggedImageIndex(null);
+  };
+
+  const handleOverviewDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    setDraggedOverviewIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleOverviewDragOverReorder = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleOverviewDropReorder = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    if (draggedOverviewIndex === null || draggedOverviewIndex === index) return;
+    
+    setOverviewImages(prev => {
+      const newImages = [...prev];
+      const draggedImage = newImages[draggedOverviewIndex];
+      newImages.splice(draggedOverviewIndex, 1);
+      newImages.splice(index, 0, draggedImage);
+      return newImages;
+    });
+    setDraggedOverviewIndex(null);
+  };
+
   const previousRegion = useRef(`${formData.majorRegion} ${formData.minorRegion}`);
 
   useEffect(() => {
@@ -711,8 +761,15 @@ export default function Registration() {
             {images.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {images.map((url, index) => (
-                  <div key={`${url}-${index}`} className="group relative aspect-square bg-zinc-100 border border-zinc-200 overflow-hidden">
-                    <img src={url} alt={`Property ${index + 1}`} className="w-full h-full object-cover" />
+                  <div 
+                    key={`${url}-${index}`} 
+                    draggable
+                    onDragStart={(e) => handleImageDragStart(e, index)}
+                    onDragOver={(e) => handleImageDragOverReorder(e, index)}
+                    onDrop={(e) => handleImageDropReorder(e, index)}
+                    className={`group relative aspect-square bg-zinc-100 border border-zinc-200 overflow-hidden cursor-move ${draggedImageIndex === index ? 'opacity-50' : ''}`}
+                  >
+                    <img src={url} alt={`Property ${index + 1}`} className="w-full h-full object-cover pointer-events-none" />
                     
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
                       <div className="flex justify-end">
@@ -788,8 +845,15 @@ export default function Registration() {
             {overviewImages.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {overviewImages.map((url, index) => (
-                  <div key={`overview-${url}-${index}`} className="group relative aspect-video bg-zinc-100 border border-zinc-200 overflow-hidden">
-                    <img src={url} alt={`Overview ${index + 1}`} className="w-full h-full object-cover" />
+                  <div 
+                    key={`overview-${url}-${index}`} 
+                    draggable
+                    onDragStart={(e) => handleOverviewDragStart(e, index)}
+                    onDragOver={(e) => handleOverviewDragOverReorder(e, index)}
+                    onDrop={(e) => handleOverviewDropReorder(e, index)}
+                    className={`group relative aspect-video bg-zinc-100 border border-zinc-200 overflow-hidden cursor-move ${draggedOverviewIndex === index ? 'opacity-50' : ''}`}
+                  >
+                    <img src={url} alt={`Overview ${index + 1}`} className="w-full h-full object-cover pointer-events-none" />
                     
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
                       <div className="flex justify-end">
