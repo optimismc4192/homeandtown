@@ -4,7 +4,7 @@ import { Play, PlusSquare, CheckSquare } from 'lucide-react';
 import { Property } from '../types';
 import { useProperties } from '../store/PropertyContext';
 
-export default function PropertyCard({ property }: { property: Property; key?: React.Key }) {
+export default function PropertyCard({ property, showVirtualTour = false }: { property: Property; showVirtualTour?: boolean; key?: React.Key }) {
   const { compareList, toggleCompareProperty } = useProperties();
   const navigate = useNavigate();
   const isCompared = compareList.some(p => p.id === property.id);
@@ -22,20 +22,35 @@ export default function PropertyCard({ property }: { property: Property; key?: R
   return (
     <div onClick={handleCardClick} className="group block cursor-pointer">
       <div className="relative aspect-video overflow-hidden bg-zinc-100 border border-zinc-200">
-        <img 
-          src={property.thumbnail} 
-          alt={property.title} 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-            <Play className="text-white fill-white ml-0.5" size={16} />
-          </div>
-        </div>
-        <div className="absolute top-2 left-2 flex flex-nowrap whitespace-nowrap gap-1 pr-2 overflow-hidden max-w-[calc(100%-16px)]">
+        {showVirtualTour && property.virtualTourEmbed ? (
+          <div 
+            className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full pointer-events-auto"
+            dangerouslySetInnerHTML={{ __html: property.virtualTourEmbed }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <>
+            <img 
+              src={property.thumbnail} 
+              alt={property.title} 
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+              <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                <Play className="text-white fill-white ml-0.5" size={16} />
+              </div>
+            </div>
+          </>
+        )}
+        <div className="absolute top-2 left-2 flex flex-nowrap whitespace-nowrap gap-1 pr-2 overflow-hidden max-w-[calc(100%-16px)] pointer-events-none">
           <span className="px-1.5 py-0.5 bg-zinc-900 text-white text-[9px] font-bold tracking-widest uppercase shrink-0">
             {property.type}
           </span>
+          {property.virtualTourEmbed && (
+            <span className="px-1.5 py-0.5 bg-blue-600 text-white text-[9px] font-bold tracking-widest uppercase shadow-sm shrink-0">
+              360도
+            </span>
+          )}
           {property.isPopular && (
             <span className="px-1.5 py-0.5 bg-red-600 text-white text-[9px] font-bold tracking-widest uppercase shadow-sm shrink-0">
               인기매물

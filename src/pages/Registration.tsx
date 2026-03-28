@@ -143,7 +143,8 @@ export default function Registration() {
     description: '',
     tags: '',
     curation: '일반 매물',
-    contact: ''
+    contact: '',
+    virtualTourEmbed: ''
   });
 
   const [showSuccess, setShowSuccess] = useState(false);
@@ -176,7 +177,8 @@ export default function Registration() {
           description: (propertyToEdit.description || '').replace(/\\n/g, '\n'),
           tags: propertyToEdit.tags.join(', '),
           curation: propertyToEdit.curation?.[0] || '일반 매물',
-          contact: propertyToEdit.contact || ''
+          contact: propertyToEdit.contact || '',
+          virtualTourEmbed: propertyToEdit.virtualTourEmbed || ''
         });
         setMapCoords(propertyToEdit.coords);
         setHasLoaded(true);
@@ -615,6 +617,7 @@ export default function Registration() {
       tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
       images: images,
       overviewImages: overviewImages,
+      virtualTourEmbed: formData.virtualTourEmbed,
       description: formData.description,
       curation: formData.curation === '일반 매물' ? [] : [formData.curation],
       status: editId ? properties.find(p => p.id === Number(editId))?.status : 'pending',
@@ -1042,6 +1045,18 @@ export default function Registration() {
                   <input type="text" name="contact" required value={formData.contact} onChange={handleChange} className="w-full border-b border-zinc-200 py-2 text-sm focus:outline-none focus:border-zinc-900" placeholder="예: 010-1234-5678" />
                 </div>
               </div>
+            </div>
+
+            <div>
+              <label className="text-[10px] md:text-xs font-bold tracking-widest text-zinc-500 uppercase mb-2 block">3D 공간투어 임베드 코드 (선택)</label>
+              <textarea 
+                name="virtualTourEmbed" 
+                rows={3} 
+                value={formData.virtualTourEmbed} 
+                onChange={handleChange} 
+                className="w-full border border-zinc-200 p-3 md:p-4 text-sm focus:outline-none focus:border-zinc-900 resize-none" 
+                placeholder="예: <iframe ...></iframe>"
+              ></textarea>
             </div>
 
             <div>

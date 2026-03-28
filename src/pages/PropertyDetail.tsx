@@ -143,18 +143,25 @@ export default function PropertyDetail() {
       </header>
 
       <div className="flex-1 overflow-y-auto">
-        {/* Video Player (16:9) */}
+        {/* Main Media (16:9) */}
         <div className="w-full aspect-video bg-zinc-900">
-          <iframe 
-            width="100%" 
-            height="100%" 
-            src={`https://www.youtube.com/embed/${property.youtubeId}?autoplay=1&mute=1`} 
-            title="YouTube video player" 
-            frameBorder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowFullScreen
-            className="w-full h-full"
-          ></iframe>
+          {property.virtualTourEmbed ? (
+            <div 
+              className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full"
+              dangerouslySetInnerHTML={{ __html: property.virtualTourEmbed }}
+            />
+          ) : (
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src={`https://www.youtube.com/embed/${property.youtubeId}?autoplay=1&mute=1`} 
+              title="YouTube video player" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
+          )}
         </div>
 
         {/* Content Area */}
@@ -170,6 +177,34 @@ export default function PropertyDetail() {
                 </span>
               ))}
             </div>
+
+            {/* Promotional Text for 3D Tour */}
+            {property.virtualTourEmbed && (
+              <div className="mb-8 p-4 bg-zinc-50 border border-zinc-200 rounded-lg">
+                <p className="text-xs text-zinc-500 text-center">
+                  3D 공간촬영 문의 " 3D공간촬영 전문업체 DoortoDoor(도어투도어) 담당자 / 010-3972-4518 "
+                </p>
+              </div>
+            )}
+
+            {/* Secondary Media (YouTube) */}
+            {property.virtualTourEmbed && (
+              <div className="mb-12">
+                <h3 className="text-base md:text-lg font-medium text-zinc-900 border-b border-zinc-200 pb-2 mb-4 font-serif">매물 영상</h3>
+                <div className="w-full aspect-video bg-zinc-100 overflow-hidden rounded-lg border border-zinc-200">
+                  <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src={`https://www.youtube.com/embed/${property.youtubeId}`} 
+                    title="YouTube video player" 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                    className="w-full h-full"
+                  ></iframe>
+                </div>
+              </div>
+            )}
 
             {/* Image Gallery */}
             {property.images && property.images.length > 0 && (

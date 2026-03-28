@@ -8,7 +8,7 @@ import Logo from '../components/Logo';
 import { motion, AnimatePresence } from 'motion/react';
 import { Property } from '../types';
 
-const PropertySlider = ({ title, subtitle, properties, icon }: { title: string, subtitle: string, properties: Property[], icon?: React.ReactNode }) => {
+const PropertySlider = ({ title, subtitle, properties, icon, showVirtualTour }: { title: string, subtitle: string, properties: Property[], icon?: React.ReactNode, showVirtualTour?: boolean }) => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -74,7 +74,7 @@ const PropertySlider = ({ title, subtitle, properties, icon }: { title: string, 
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: index * 0.05 }}
                     >
-                      <PropertyCard property={property} />
+                      <PropertyCard property={property} showVirtualTour={showVirtualTour} />
                     </motion.div>
                   ))}
                 </div>
@@ -141,6 +141,7 @@ export default function Home() {
 
   const popularProperties = useMemo(() => approvedProperties.filter(p => p.isPopular), [approvedProperties]);
   const latestProperties = useMemo(() => [...approvedProperties].sort((a, b) => b.id - a.id), [approvedProperties]);
+  const virtualTourProperties = useMemo(() => approvedProperties.filter(p => p.virtualTourEmbed).sort((a, b) => b.id - a.id), [approvedProperties]);
   const premiumProperties = useMemo(() => approvedProperties.filter(p => p.curation?.includes('주목받는 프리미엄 분양 현장')), [approvedProperties]);
   const natureProperties = useMemo(() => approvedProperties.filter(p => p.curation?.includes('자연을 품은 넓은 마당')), [approvedProperties]);
 
@@ -417,6 +418,14 @@ export default function Home() {
               subtitle="Latest Properties" 
               properties={latestProperties} 
               icon={<span className="text-blue-500">✨</span>}
+            />
+
+            <PropertySlider 
+              title="360도 실제 매물보기 가능장소" 
+              subtitle="360° Virtual Tour" 
+              properties={virtualTourProperties} 
+              icon={<span className="text-blue-600">🔄</span>}
+              showVirtualTour={true}
             />
 
             <PropertySlider 

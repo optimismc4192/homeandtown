@@ -20,6 +20,7 @@ export interface Property {
   tags: string[];
   images?: string[];
   overviewImages?: string[];
+  virtualTourEmbed?: string;
   description: string;
   curation?: string[];
   isPopular?: boolean;
